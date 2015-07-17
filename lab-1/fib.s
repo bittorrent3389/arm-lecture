@@ -4,40 +4,23 @@
 	.align 2
 	.thumb
 	.thumb_func
-
 	.global fibonacci
 	.type fibonacci, function
-
 fibonacci:
-	@ ADD/MODIFY CODE BELOW
-	@ PROLOG
-	push {r3, r4, r5, lr}
+	@push {r4, r5, r6, lr}
+	mov r4, #0     @ sum = 0;
+	mov r5, #1	   @ result = 1;
+	mov r6, #-1    @ prev = -1;
+.loop:		
+	add r4, r5, r6
+	mov r6, r5
+	mov r5, r4
 
-	@ R4 = R0 - 0 (update flags)
-	@ if(R0 <= 0) goto .L3 (which returns 0)
-
-	@ Compare R4 wtih 1
-	@ If R4 == 1 goto .L4 (which returns 1)
-
-	@ R0 = R4 - 1
-	@ Recursive call to fibonacci with R4 - 1 as parameter
-
-	@ R5 = R0
-	@ R0 = R4 - 2
-	@ Recursive call to fibonacci with R4 - 2 as parameter
-
-	@ R0 = R5 + R0 (update flags)
-
-	pop {r3, r4, r5, pc}		@EPILOG
-
-	@ END CODE MODIFICATION
-.L3:
-	mov r0, #0			@ R0 = 0
-	pop {r3, r4, r5, pc}		@ EPILOG
-
-.L4:
-	mov r0, #1			@ R0 = 1
-	pop {r3, r4, r5, pc}		@ EPILOG
-
+	subs r0, #1     @ r0 = r0 - 1 
+	ite lt			 @ if (r0 < 0) then ... else ...
+	movlt r0, r5 	 @ because r0 < 0, mov r0, r5
+	bge .loop        @ if(r0 >= 0) goto .loop
+	@pop {r4, r5, r6, pc}		@EPILOG
+	bx lr 
 	.size fibonacci, .-fibonacci
 	.end
